@@ -1,5 +1,6 @@
-const multer = require('multer');
-const { v4: uuidv4 } = require('uuid');
+import multer, { FileFilterCallback } from 'multer';
+import { v4 } from 'uuid';
+import { ERROR_MESSAGES } from '../libs/constants';
 
 // TODO -> we need the rest of the mime types
 const MIME_TYPE_MAP: any = {
@@ -10,28 +11,26 @@ const MIME_TYPE_MAP: any = {
   'image/webp': 'webp'
 };
 
-interface UploadedFile extends File {
-  mimetype: string;
-}
-
 export const fileUpload = multer({
-  limits: process.env.FILE_UPLOAD_LIMIT,
+  limits: { fileSize: 500000 },
   /* this is the set max size in bytes */
   storage: multer.diskStorage({
-    destination: (req: any, file: UploadedFile, callBack: Function) => {
-      callBack(null, 'uploads/images');
-    },
-    filename: (req: any, file: UploadedFile, callBack: Function) => {
-      const ext = MIME_TYPE_MAP[file.mimetype];
-      //we extract the right extension with mimetype to recognize and use it
-      callBack(null, uuidv4() + '.' + ext);
-      /* file name generator */
-    }
+    destination: ((req: Express.Request, file: Express.Multer.File, callBack: Function) => {
+      callBack(null, 'uploads/files');
+    }),
+    filename: ((req: Express.Request, file: Express.Multer.File, callBack: Function) => {
+      const extension = MIME_TYPE_MAP[file.mimetype];
+
+      callBack(null, `${v4()}.${extension}`);
+    })
   }),
-  fileFilter: (req: any, file: UploadedFile, callBack: Function) => {
+  fileFilter: ((req: Express.Request, file: Express.Multer.File, callBack: FileFilterCallback) => {
     const isValid = !!MIME_TYPE_MAP[file.mimetype];
 
-    let error = isValid ? null : new Error('Invalid mime type!');
-    callBack(error, isValid);
-  }
+    if (isValid) {
+      callBack(null, isValid);
+    }
+
+    callBack(new Error(ERROR_MESSAGES.INVALID_MIME));
+  })
 });
