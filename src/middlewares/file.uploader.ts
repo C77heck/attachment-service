@@ -5,7 +5,9 @@ const { v4: uuidv4 } = require('uuid');
 const MIME_TYPE_MAP: any = {
   'image/png': 'png',
   'image/jpeg': 'jpeg',
-  'image/jpg': 'jpg'
+  'image/jpg': 'jpg',
+  'image/tiff': 'tiff',
+  'image/webp': 'webp'
 };
 
 interface UploadedFile extends File {
