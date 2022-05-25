@@ -41,7 +41,12 @@ const parseBuffer = (src: Buffer) => {
 };
 
 export const setEnvs = () => {
-  const envFilePath = path.join(path.dirname('attachment_service'), '.env');
+  // path.resolve will give us the root directory like __dirname
+  const envFilePath = path.join(path.resolve(), '.env');
+
+  if (!envFilePath) {
+    return;
+  }
 
   const bufferEnv = fs.readFileSync(envFilePath);
 
