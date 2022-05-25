@@ -12,7 +12,7 @@ interface UploadedFile extends File {
   mimetype: string;
 }
 
-const fileUpload = multer({
+export const fileUpload = multer({
   limits: process.env.FILE_UPLOAD_LIMIT,
   /* this is the set max size in bytes */
   storage: multer.diskStorage({
@@ -33,5 +33,3 @@ const fileUpload = multer({
     callBack(error, isValid);
   }
 });
-
-module.exports = fileUpload;
