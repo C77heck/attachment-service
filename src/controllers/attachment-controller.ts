@@ -7,7 +7,6 @@ import { HttpError } from '../models/http.error';
 
 export const getAttachmentById = async (req: any, res: any, next: NextFunction) => {
   try {
-    const filePath = req.file.path;
     const attachment = await Attachments.findById(req.params?.attachmentId || '');
 
     res.status(200).json({ attachment });
@@ -18,7 +17,7 @@ export const getAttachmentById = async (req: any, res: any, next: NextFunction) 
 
 export const createAttachment = async (req: any, res: any, next: NextFunction) => {
   try {
-    const createdAttachment = (new Attachments({ ...req.body })).save();
+    const createdAttachment = (new Attachments({ name: req.body.name, url: req.file.path })).save();
 
     res.status(201).json({ attachment: createdAttachment });
   } catch (e) {
@@ -27,6 +26,7 @@ export const createAttachment = async (req: any, res: any, next: NextFunction) =
 };
 
 export const deleteAttachment = async (req: any, res: any, next: NextFunction) => {
+  // TODO -> we need to locate the file and delete it from the filesystem. perhaps matching names will help.
   try {
     await Attachments.delete(req.params?.attachmentId || '');
 
