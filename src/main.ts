@@ -1,10 +1,10 @@
 import cors from 'cors';
 import express from 'express';
+import fileUpload from 'express-fileupload';
 import Mongoose from 'mongoose';
 import { setEnvs } from './libs/set-up.environment';
 // eslint-disable-next-line import/extensions
 import apiRouter from './routes/api.routes';
-
 // Constants
 const app = express();
 setEnvs();
@@ -16,7 +16,7 @@ app.use(cors());
 // Common middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(fileUpload());
 /***********************************************************************************
  *                         API routes and error handling
  **********************************************************************************/
