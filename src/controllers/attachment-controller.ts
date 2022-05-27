@@ -7,6 +7,7 @@ import { HttpError } from '../models/http.error';
 
 export const getAttachmentById = async (req: any, res: any, next: NextFunction) => {
   try {
+    const filePath = req.file.path;
     const attachment = await Attachments.findById(req.params?.attachmentId || '');
 
     res.status(200).json({ attachment });
