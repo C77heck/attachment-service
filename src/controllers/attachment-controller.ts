@@ -12,7 +12,6 @@ import { FileInterface } from './interfaces/file.interface';
 export const getFile = async (req: express.Request, res: any, next: NextFunction) => {
   try {
     res.sendFile(`${path.resolve()}/attachments/files/${req.params.fileName}`);
-
   } catch (e) {
     return next(new HttpError(e as any));
   }
@@ -28,7 +27,6 @@ export const createAttachment = async (req: any, res: any, next: NextFunction) =
   try {
     const file: FileInterface = req.files?.file;
     const uploadName = file?.name;
-    // const storedName = `${v4()}.${getFileExtension(file.mimetype)}`;
     const name = `${v4()}.webp`;
     const url = `${process.env.FILE_PATH}/api/attachments/${name}`;
     const save = `${path.resolve()}/attachments/files/${name}`;
