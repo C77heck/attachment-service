@@ -6,11 +6,13 @@ const Schema = mongoose.Schema;
 
 export interface AttachmentDocument extends Document {
   name: string;
+  uploadName: string;
   url: string;
 }
 
 const attachmentSchema = new Schema({
   name: { type: String, required: true },
+  uploadName: { type: String, required: true },
   url: { type: String, required: true },
 });
 

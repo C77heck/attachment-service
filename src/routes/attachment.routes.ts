@@ -1,17 +1,10 @@
 import express from 'express';
-import multer from 'multer';
-import { createAttachment, deleteAttachment, getAttachmentById } from '../controllers/attachment-controller';
-
-const multerOptions = {
-  limits: {
-    fileSize: 2 * (1024 ** 2)
-  }
-};
+import { createAttachment, deleteAttachment, getFile } from '../controllers/attachment-controller';
 
 const router = express.Router();
 
-router.get('/get-by-id/:attachmentId', [], getAttachmentById);
-
+router.get('/:fileName', [], getFile);
+// fileUpload.single('file'),
 router.post('/create', [], createAttachment);
 
 router.delete('/delete/:reviewId', [], deleteAttachment);

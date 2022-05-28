@@ -5,6 +5,7 @@ export const ERROR_MESSAGES = {
   FAILED_AUTH: 'Authentication failed!',
   INVALID_MIME: 'Invalid mime type!',
   INVALID_INPUT_DATA: 'Invalid inputs passed, please check your data',
+  FILE_UPLOAD_FAILED: 'File upload failed',
 };
 
 export const MESSAGES = {
