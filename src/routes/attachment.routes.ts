@@ -7,6 +7,6 @@ router.get('/:fileName', [], getFile);
 // fileUpload.single('file'),
 router.post('/create', [], createAttachment);
 
-router.delete('/delete/:reviewId', [], deleteAttachment);
+router.delete('/delete/:fileName', [], deleteAttachment);
 
 export default router;

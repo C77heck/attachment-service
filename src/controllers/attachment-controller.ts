@@ -1,5 +1,6 @@
 import express, { NextFunction } from 'express';
 import { validationResult } from 'express-validator';
+import fs from 'fs';
 import path from 'path';
 import { v4 } from 'uuid';
 import { ERROR_MESSAGES, MESSAGES } from '../libs/constants';
@@ -37,24 +38,32 @@ export const createAttachment = async (req: any, res: any, next: NextFunction) =
       }
     });
 
-    console.log({ url });
-
     const createdAttachment = (new Attachments({ url, uploadName, name: storedName, })).save();
 
     res.status(201).json({ attachment: createdAttachment });
   } catch (e) {
-    console.log({ e });
     return next(new HttpError(ERROR_MESSAGES.GENERIC));
   }
 };
 
 export const deleteAttachment = async (req: any, res: any, next: NextFunction) => {
-  // TODO -> we need to locate the file and delete it from the filesystem. perhaps matching names will help.
-  try {
-    await Attachments.delete(req.params?.attachmentId || '');
+  const fileName = req.params.fileName;
 
-    res.status(200).json({ successMessage: MESSAGES.DELETED_SUCCESSFULLY });
+  try {
+    await Attachments.delete(fileName);
   } catch (e) {
-    return next(new HttpError(ERROR_MESSAGES.GENERIC));
+    return next(new HttpError(e as any));
   }
+
+  try {
+    fs.unlink(`${path.resolve()}/attachments/files/${fileName}`, function (err) {
+      if (err) throw err;
+      console.log('File deleted!', fileName);
+    });
+
+  } catch (e) {
+    return next(new HttpError(e as any));
+  }
+
+  res.status(200).json({ successMessage: MESSAGES.DELETED_SUCCESSFULLY });
 };
