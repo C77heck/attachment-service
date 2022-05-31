@@ -4,7 +4,7 @@ import { createAttachment, deleteAttachment, getFile } from '../controllers/atta
 const router = express.Router();
 
 router.get('/:fileName', [], getFile);
-// fileUpload.single('file'),
+
 router.post('/create', [], createAttachment);
 
 router.delete('/delete/:fileName', [], deleteAttachment);
