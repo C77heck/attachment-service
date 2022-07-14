@@ -2,12 +2,23 @@ import express, { NextFunction } from 'express';
 import { validationResult } from 'express-validator';
 import fs from 'fs';
 import path from 'path';
-import sharp from 'sharp';
 import { v4 } from 'uuid';
 import { ERROR_MESSAGES, MESSAGES } from '../libs/constants';
 import Attachments from '../models/attachment.model';
 import { HttpError } from '../models/http.error';
-import { FileInterface } from './interfaces/file.interface';
+import { SharpService } from '../services/sharp.service';
+
+export interface FileData {
+  lastModified: number;
+  lastModifiedDate: Date;
+  name: string;
+  size: number;
+  type: string | "image/png";
+  webkitRelativePath: string;
+  file: Buffer; // base64
+  mv: Function;
+  compressionQuality?: 'high' | 'low' | 'medium';
+}
 
 export const getFile = async (req: express.Request, res: any, next: NextFunction) => {
   try {
@@ -25,48 +36,30 @@ export const createAttachment = async (req: any, res: any, next: NextFunction) =
   }
 
   try {
-    const file: FileInterface = req.files?.file;
-    const uploadName = file?.name;
+    const body: FileData = req.body;
+    // const file = body.file;
+    const file = Buffer.from(body.file, 'base64' as any);
+    // console.log(file);
+
+    const uploadName = body?.name;
     const name = `${v4()}.webp`;
     const url = `${process.env.FILE_PATH}/api/attachments/${name}`;
-    const save = `${path.resolve()}/attachments/files/${name}`;
+    const savePath = `${path.resolve()}/attachments/files/${name}`;
 
-    switch (req.body.compressionQuality) {
-      case 'low':
-        await sharp(file.data)
-          .webp({ quality: 40, })
-          .toFile(save);
-        break;
-      case 'medium':
-        await sharp(file.data)
-          .webp({ quality: 80 })
-          .toFile(save);
-        break;
-      case 'high':
-        await sharp(file.data)
-          .webp({ quality: 100 })
-          .toFile(save);
-        break;
-      default:
-        file.mv(`${path.resolve()}/attachments/files/${name}`, (err: any) => {
-          if (err) {
-            throw new HttpError(ERROR_MESSAGES.FILE_UPLOAD_FAILED, 500);
-          }
-        });
-        break;
-    }
+    await SharpService.resize(file, savePath, body.type.split('/')[1], body?.compressionQuality);
 
     const createdAttachment = new Attachments({
       url, uploadName, name,
-      size: file.size,
-      encoding: file.encoding,
-      mimeType: file.mimetype
+      size: body.size,
+      encoding: 'utf8',
+      mimeType: body.type
     });
-
+    console.log(3);
     createdAttachment.save();
 
     res.status(201).json({ attachment: createdAttachment });
   } catch (e) {
+    console.log(e);
     return next(new HttpError(ERROR_MESSAGES.GENERIC));
   }
 };
