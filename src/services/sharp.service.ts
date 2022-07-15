@@ -1,7 +1,4 @@
-import * as fs from 'fs';
 import sharp from 'sharp';
-import { ERROR_MESSAGES } from '../libs/constants';
-import { HttpError } from '../models/http.error';
 
 export class SharpService {
   public static async resize(file: Buffer, savePath: string, extension: string, quality?: 'high' | 'medium' | 'low') {
@@ -26,11 +23,12 @@ export class SharpService {
           throw {};
       }
     } catch (e) {
-      fs.writeFile(`test.${extension}`, file, {}, (err: any) => {
-        if (err) {
-          throw new HttpError(ERROR_MESSAGES.FILE_UPLOAD_FAILED, 500);
-        }
-      });
+      await sharp(file).toFile(savePath);
+      // fs.writeFile(`test.${extension}`, file, {}, (err: any) => {
+      //   if (err) {
+      //     throw new HttpError(ERROR_MESSAGES.FILE_UPLOAD_FAILED, 500);
+      //   }
+      // });
     }
 
   }

@@ -16,6 +16,7 @@ app.use(cors());
 // Common middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// TODO NEED OT HANDLE THE LIMIT ON THIS
 app.use(fileUpload());
 /***********************************************************************************
  *                         API routes and error handling
