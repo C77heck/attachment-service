@@ -31,7 +31,6 @@ app.use('/api', apiRouter);
 
 (async () => {
   try {
-    console.log(process.env.MONGO_URL);
     const port = process.env.PORT || 3030;
     await Mongoose.connect(process.env.MONGO_URL || '');
     await app.listen(port, () => console.log(`app is listening on port: ${port}`));
