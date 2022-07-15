@@ -18,6 +18,7 @@ export interface FileData {
   file: Buffer; // base64
   mv: Function;
   compressionQuality?: 'high' | 'low' | 'medium';
+  alt?: 'string';
 }
 
 export const getFile = async (req: express.Request, res: any, next: NextFunction) => {
@@ -42,6 +43,7 @@ export const createAttachment = async (req: any, res: any, next: NextFunction) =
     // console.log(file);
 
     const uploadName = body?.name;
+    const alt = body?.alt;
     const name = `${v4()}.webp`;
     const url = `${process.env.FILE_PATH}/api/attachments/${name}`;
     const savePath = `${path.resolve()}/attachments/files/${name}`;
@@ -49,7 +51,10 @@ export const createAttachment = async (req: any, res: any, next: NextFunction) =
     await SharpService.resize(file, savePath, body.type.split('/')[1], body?.compressionQuality);
 
     const createdAttachment = new Attachments({
-      url, uploadName, name,
+      url,
+      uploadName,
+      name,
+      alt,
       size: body.size,
       encoding: 'utf8',
       mimeType: body.type
