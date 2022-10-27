@@ -24,11 +24,6 @@ export class SharpService {
       }
     } catch (e) {
       await sharp(file).toFile(savePath);
-      // fs.writeFile(`test.${extension}`, file, {}, (err: any) => {
-      //   if (err) {
-      //     throw new HttpError(ERROR_MESSAGES.FILE_UPLOAD_FAILED, 500);
-      //   }
-      // });
     }
 
   }

@@ -1,11 +1,13 @@
 import express from 'express';
-import { createAttachment, deleteAttachment, getFile } from '../controllers/attachment-controller';
+import { createFileAttachment, createImageAttachment, deleteAttachment, getFile } from '../controllers/attachment-controller';
 
 const router = express.Router();
 
 router.get('/:fileName', [], getFile);
 
-router.post('/create', [], createAttachment);
+router.post('/image-upload', [], createImageAttachment);
+
+router.post('/file-upload', [], createFileAttachment);
 
 router.delete('/delete/:fileName', [], deleteAttachment);
 

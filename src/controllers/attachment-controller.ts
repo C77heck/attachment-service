@@ -7,6 +7,7 @@ import { ERROR_MESSAGES, MESSAGES } from '../libs/constants';
 import Attachments from '../models/attachment.model';
 import { HttpError } from '../models/http.error';
 import { SharpService } from '../services/sharp.service';
+import { getFileExtension } from './libs/helpers';
 
 export interface FileData {
   lastModified: number;
@@ -29,7 +30,7 @@ export const getFile = async (req: express.Request, res: any, next: NextFunction
   }
 };
 
-export const createAttachment = async (req: any, res: any, next: NextFunction) => {
+export const createImageAttachment = async (req: any, res: any, next: NextFunction) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -40,7 +41,6 @@ export const createAttachment = async (req: any, res: any, next: NextFunction) =
     const body: FileData = req.body;
     // const file = body.file;
     const file = Buffer.from(body.file, 'base64' as any);
-    // console.log(file);
 
     const uploadName = body?.name;
     const alt = body?.alt;
@@ -59,12 +59,52 @@ export const createAttachment = async (req: any, res: any, next: NextFunction) =
       encoding: 'utf8',
       mimeType: body.type
     });
-    console.log(3);
+
     createdAttachment.save();
 
     res.status(201).json({ attachment: createdAttachment });
   } catch (e) {
-    console.log(e);
+    return next(new HttpError(ERROR_MESSAGES.GENERIC));
+  }
+};
+
+export const createFileAttachment = async (req: any, res: any, next: NextFunction) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return next(new HttpError(ERROR_MESSAGES.INVALID_INPUT_DATA, 422));
+  }
+
+  try {
+    const body: FileData = req.body;
+    const file = Buffer.from(body.file, 'base64' as any);
+    const extension = getFileExtension(body.type);
+    const uploadName = body?.name;
+    const alt = body?.alt;
+    const name = `${v4()}.${extension}`;
+    const url = `${process.env.FILE_PATH}/api/attachments/${name}`;
+    const savePath = `${path.resolve()}/attachments/files/${name}`;
+
+    fs.writeFile(savePath, file, {}, (err: any) => {
+      if (err) {
+        throw new HttpError(ERROR_MESSAGES.FILE_UPLOAD_FAILED, 500);
+      }
+    });
+
+    const createdAttachment = new Attachments({
+      url,
+      uploadName,
+      name,
+      alt,
+      size: body.size,
+      encoding: 'utf8',
+      mimeType: body.type
+    });
+
+    createdAttachment.save();
+
+    res.status(201).json({ attachment: createdAttachment });
+  } catch (e) {
     return next(new HttpError(ERROR_MESSAGES.GENERIC));
   }
 };
